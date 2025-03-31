@@ -4,6 +4,13 @@ from ColdPlate_api import ColdPlateAPI  # Gebruik expliciete import
 app = Flask(__name__)
 api = ColdPlateAPI()
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST"
+    return response
+
 @app.route('/list_ports', methods=['GET'])
 def list_ports():
     """
@@ -18,12 +25,12 @@ def select_port():
     Endpoint to select a USB port.
     """
     data = request.json
-    port_name = data.get('port_name')
-    if not port_name:
+    port = data.get('port')
+    if not port:
         return jsonify({"error": "port_name is required"}), 400
     try:
-        api.select_port(port_name)
-        return jsonify({"message": f"Port {port_name} selected successfully"})
+        api.select_port(port)
+        return jsonify({"message": f"Port {port} selected successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -59,7 +66,7 @@ def set_temp_target():
     if target_temp is None:
         return jsonify({"error": "target_temp is required"}), 400
     try:
-        target_temp = int(target_temp)  # Converteer naar integer
+        target_temp = int(target_temp*10)  # Converteer naar integer
         response = api.set_temp_target(target_temp)
         return jsonify({"response": response})
     except ValueError:
@@ -240,6 +247,7 @@ def get_temp_state():
         state = api.get_temp_state()
         return jsonify({"state": state})
     except Exception as e:
+        print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/get_temp_state_as_string', methods=['GET'])
