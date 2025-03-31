@@ -14,13 +14,15 @@ class ColdPlateCommands:
         ports = serial.tools.list_ports.comports()
         return [port.device for port in ports]
 
+
     def select_port(self, port_name):
         """
         Select a USB port for communication.
         """
         if self.serial_connection:
             self.serial_connection.close()
-        self.serial_connection = serial.Serial(port_name, baudrate=9600, timeout=1)
+        self.serial_connection = serial.Serial(port_name, baudrate=9600, timeout=1, bytesize=8, parity='N', stopbits=1)
+        print("Connected to ColdPlate.")
 
     def send_command(self, command):
         """
@@ -28,8 +30,11 @@ class ColdPlateCommands:
         """
         if not self.serial_connection or not self.serial_connection.is_open:
             raise ConnectionError("No USB port selected or connection is closed.")
-        self.serial_connection.write(f"{command}\n".encode())
-        return self.serial_connection.readline().decode().strip()
+        command += '\r'  # Append carriage return as per manual
+        self.serial_connection.write(command.encode('ascii'))
+        #time.sleep(0.1)  # Wait for response
+        response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
+        return response
 
     def close_connection(self):
         """
