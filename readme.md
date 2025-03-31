@@ -1,3 +1,5 @@
+The ColdPlate API was developed using the `pyserial` library to facilitate communication with the device over USB and the `Flask` framework to create a lightweight and efficient web API. The combination of these technologies ensures reliable data exchange between the API and the hardware while providing an easy-to-use interface for developers.
+
 # API Endpoints for ColdPlate API
 
 ## Connection Management
