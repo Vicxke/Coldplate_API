@@ -1,0 +1,74 @@
+# API Options for ColdPlate API
+
+## Server Endpoints
+- GET /list_ports
+- POST /select_port
+- GET /get_version
+- POST /temp_on
+- POST /set_temp_target
+- POST /close_connection
+- GET /get_description
+- GET /get_version_and_description
+- GET /get_info
+- POST /reset_device
+- GET /get_error_list
+- POST /enable_cled
+- POST /disable_cled
+- GET /get_cled_status
+- POST /flash_led
+- POST /set_buzzer
+- POST /enable_boot_screen
+- POST /disable_boot_screen
+- GET /get_boot_screen_state
+- POST /set_led_brightness
+- POST /enable_led_pulse_mode
+- POST /disable_led_pulse_mode
+- POST /temp_off
+- GET /get_temp_state
+- GET /get_temp_state_as_string
+- GET /get_temp_target
+- GET /get_temp_actual
+- GET /get_temp_min
+- GET /get_temp_max
+- GET /get_temp_limiter_min
+- POST /set_temp_limiter_min
+- GET /get_temp_limiter_max
+- POST /set_temp_limiter_max
+- POST /enable_temp_logging
+- POST /disable_temp_logging
+
+## API Commands (ColdPlate_api)
+- list_ports()
+- select_port(port_name)
+- get_version()
+- get_description()
+- get_version_and_description()
+- get_info()
+- reset_device()
+- get_error_list()
+- enable_cled()
+- disable_cled()
+- get_cled_status()
+- flash_led()
+- set_buzzer(duration)
+- enable_boot_screen()
+- disable_boot_screen()
+- get_boot_screen_state()
+- set_led_brightness(brightness)
+- enable_led_pulse_mode()
+- disable_led_pulse_mode()
+- temp_on()
+- temp_off()
+- get_temp_state()
+- get_temp_state_as_string()
+- get_temp_target()
+- set_temp_target(target_temp)
+- get_temp_actual()
+- get_temp_min()
+- get_temp_max()
+- get_temp_limiter_min()
+- set_temp_limiter_min(min_temp)
+- get_temp_limiter_max()
+- set_temp_limiter_max(max_temp)
+- enable_temp_logging()
+- disable_temp_logging()
