@@ -1,4 +1,4 @@
-from ColdPlate_commands import ColdPlateCommands
+from ColdPlate_commands import ColdPlateCommands  # Gebruik expliciete import
 
 class ColdPlateAPI:
     def __init__(self):

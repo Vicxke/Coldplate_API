@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from ColdPlate_api import ColdPlateAPI
+from ColdPlate_api import ColdPlateAPI  # Gebruik expliciete import
 
 app = Flask(__name__)
 api = ColdPlateAPI()
