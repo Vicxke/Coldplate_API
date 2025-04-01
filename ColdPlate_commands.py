@@ -38,17 +38,17 @@ class ColdPlateCommands:
             self.serial_connection.write(command.encode('ascii'))
 
             # Read the version number (first response line)
-            version_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
-            print(f"DEBUG: Received version response: {version_response}")
+            response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
+            print(f"DEBUG: Received version response: {response}")
 
             # Check if the response indicates an error ('e')
-            error_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
-            print(f"DEBUG: Received error response: {error_response}")
+            #error_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
+            #print(f"DEBUG: Received error response: {error_response}")
 
-            if error_response == 'e':
-                raise Exception(f"Error from device: {version_response}")
+            if response == 'e':
+                raise Exception(f"Error from device: {response}")
 
-            return version_response  # Return the version number
+            return response  # Return the version number
 
     def close_connection(self):
         """
