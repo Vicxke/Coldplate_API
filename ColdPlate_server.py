@@ -1,5 +1,3 @@
-#service name on pi is coldplate.service
-
 from flask import Flask, request, jsonify
 from ColdPlate_api import ColdPlateAPI  # Gebruik expliciete import
 
@@ -33,6 +31,17 @@ def select_port():
     try:
         api.select_port(port)
         return jsonify({"message": f"Port {port} selected successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/is_connected', methods=['GET'])
+def is_connected():
+    """
+    Endpoint to check if there is a connection.
+    """
+    try:
+        connected = api.is_connected()
+        return jsonify({"connected": connected})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -249,6 +258,7 @@ def get_temp_state():
         state = api.get_temp_state()
         return jsonify({"state": state})
     except Exception as e:
+        print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/get_temp_state_as_string', methods=['GET'])

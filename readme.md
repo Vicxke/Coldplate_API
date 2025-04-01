@@ -6,6 +6,7 @@ The ColdPlate API was developed using the `pyserial` library to facilitate commu
 - **GET /list_ports**: Lists all available USB ports.
 - **POST /select_port**: Selects a USB port for communication.
 - **POST /close_connection**: Closes the USB connection.
+- **GET /is_connected**: see if there is a connection.
 
 ## Device Information
 - **GET /get_version**: Retrieves the device version.

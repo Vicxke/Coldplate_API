@@ -16,6 +16,12 @@ class ColdPlateAPI:
         """
         self.commands.select_port(port_name)
 
+    def is_connected(self):
+        """
+        Check if the device is connected.
+        """
+        return self.commands.serial_connection.is_open if self.commands.serial_connection else False
+
     def get_version(self):
         """
         Get the version of the connected device.
