@@ -1,11 +1,13 @@
 import serial
 import serial.tools.list_ports
+import threading
 
 __all__ = ['ColdPlateCommands']  # Exporteer expliciet de klasse ColdPlateCommands
 
 class ColdPlateCommands:
     def __init__(self):
         self.serial_connection = None
+        self.lock = threading.Lock()  # Add a threading lock
 
     def list_ports(self):
         """
@@ -14,32 +16,45 @@ class ColdPlateCommands:
         ports = serial.tools.list_ports.comports()
         return [port.device for port in ports]
 
-
     def select_port(self, port_name):
         """
         Select a USB port for communication.
         """
-        if self.serial_connection:
-            self.serial_connection.close()
-        self.serial_connection = serial.Serial(port_name, baudrate=9600, timeout=1, bytesize=8, parity='N', stopbits=1)
-        print("Connected to ColdPlate.")
-
+        with self.lock:  # Ensure thread-safe access
+            if self.serial_connection:
+                self.serial_connection.close()
+            self.serial_connection = serial.Serial(port_name, baudrate=9600, timeout=1, bytesize=8, parity='N', stopbits=1)
+            print("Connected to ColdPlate.")
+        
     def send_command(self, command):
-        """
-        Send a command to the connected device.
-        """
-        if not self.serial_connection or not self.serial_connection.is_open:
-            raise ConnectionError("No USB port selected or connection is closed.")
-        command += '\r'  # Append carriage return as per manual
-        self.serial_connection.write(command.encode('ascii'))
-        #time.sleep(0.1)  # Wait for response
-        response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
-        return response
+        with self.lock:  # Ensure thread-safe access
+            if not self.serial_connection or not self.serial_connection.is_open:
+                raise ConnectionError("No USB port selected or connection is closed.")
+
+            # Ensure the command ends with a carriage return
+            command += '\r'
+            
+            # Send the command
+            self.serial_connection.write(command.encode('ascii'))
+
+            # Read the version number (first response line)
+            version_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
+            print(f"DEBUG: Received version response: {version_response}")
+
+            # Check if the response indicates an error ('e')
+            error_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
+            print(f"DEBUG: Received error response: {error_response}")
+
+            if error_response == 'e':
+                raise Exception(f"Error from device: {version_response}")
+
+            return version_response  # Return the version number
 
     def close_connection(self):
         """
         Close the USB connection.
         """
-        if self.serial_connection:
-            self.serial_connection.close()
-            self.serial_connection = None
+        with self.lock:  # Ensure thread-safe access
+            if self.serial_connection:
+                self.serial_connection.close()
+                self.serial_connection = None

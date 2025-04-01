@@ -249,7 +249,6 @@ def get_temp_state():
         state = api.get_temp_state()
         return jsonify({"state": state})
     except Exception as e:
-        print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/get_temp_state_as_string', methods=['GET'])
