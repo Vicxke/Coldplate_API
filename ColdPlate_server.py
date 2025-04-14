@@ -1,8 +1,13 @@
 from flask import Flask, request, jsonify
 from ColdPlate_api import ColdPlateAPI  # Gebruik expliciete import
+from Syringe import SyringeCommands  # Gebruik expliciete import
 
 app = Flask(__name__)
 api = ColdPlateAPI()
+
+syringeApi = SyringeCommands()
+
+port = 5001
 
 @app.after_request
 def add_cors_headers(response):
@@ -368,6 +373,94 @@ def disable_temp_logging():
         return jsonify({"response": response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+#syringe endpoints
+
+@app.route('/syringe_connect', methods=['POST'])
+def syringe_connect():
+    """
+    Endpoint to connect to the syringe pump.
+    """
+    data = request.json
+    port = data.get('port')
+    if not port:
+        return jsonify({"error": "port is required"}), 400
+    try:
+        syringeApi.connect(port)
+        return jsonify({"message": f"Syringe pump connected to {port} successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/syringe_run', methods=['POST'])
+def syringe_turn_on():
+    """
+    Endpoint to turn on the syringe pump.
+    """
+    try:
+        response = syringeApi.send_command('run')
+        return jsonify({"message": "Syringe pump turned on successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/syringe_stop', methods=['POST'])
+def syringe_turn_off():
+    """
+    Endpoint to turn off the syringe pump.
+    """
+    try:
+        response = syringeApi.send_command('stop')
+        return jsonify({"message": "Syringe pump turned off successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/syringe_disconnect', methods=['POST'])
+def syringe_disconnect():
+    """
+    Endpoint to disconnect the syringe pump.
+    """
+    try:
+        syringeApi.disconnect()
+        return jsonify({"message": "Syringe pump disconnected successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/syringe_set_rate', methods=['POST'])
+def syringe_set_rate():
+    """
+    Endpoint to set the syringe pump rate.
+    """
+    data = request.json
+    rate = data.get('rate')
+    unit = data.get('unit')  # Default to uL/h if not provided
+    if rate is None:
+        return jsonify({"error": "rate is required"}), 400
+    if unit is None:
+        return jsonify({"error": "unit is required"}), 400
+    try:
+        response = syringeApi.send_command(f'irate {rate} {unit}')
+        return jsonify({"message": f"Syringe pump rate set to {rate} {unit} successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/syringe_set_withdraw_rate', methods=['GET'])
+def syringe_set_withdraw_rate():
+    """
+    Endpoint to set the syringe pump withdraw rate.
+    """
+    data = request.json
+    rate = data.get('rate')
+    unit = data.get('unit')
+    if rate is None:
+        return jsonify({"error": "rate is required"}), 400
+    if unit is None:
+        return jsonify({"error": "unit is required"}), 400
+    try:
+        response = syringeApi.send_command(f'wrate {rate} {unit}')
+        return jsonify({"message": f"Syringe pump withdraw rate set to {rate} {unit} successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=port)
