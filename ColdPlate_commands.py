@@ -27,35 +27,24 @@ class ColdPlateCommands:
                 self.serial_connection.close()
             self.serial_connection = serial.Serial(port_name, baudrate=9600, timeout=1, bytesize=8, parity='N', stopbits=1)
             print("Connected to ColdPlate.")
-        
+            
     def send_command(self, command):
-        print(f"DEBUG: Sending command: {command}")
-        with self.lock:  # Ensure thread-safe access
+        print(f"DEBUG: [Thread {threading.get_ident()}] Trying to acquire lock for: {command}")
+        with self.lock:
+            print(f"DEBUG: [Thread {threading.get_ident()}] LOCK ACQUIRED for: {command}")
             if not self.serial_connection or not self.serial_connection.is_open:
                 raise ConnectionError("No USB port selected or connection is closed.")
 
-            # Ensure the command ends with a carriage return
-            command += '\r'
-
-            #flush buffer before sending the command
             self.serial_connection.reset_input_buffer()
-            
-            # Send the command
+            self.serial_connection.reset_output_buffer()
+
+            command += '\r'
             self.serial_connection.write(command.encode('ascii'))
-
-            # Read the output
             response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
-            #time.sleep(0.05)  # Wait for the device to process the command only if needed
-            print(f"DEBUG: Received version response: {response}")
-    
-            # Check if the response indicates an error ('e')
-            #error_response = self.serial_connection.read_until(b'\r\n').decode('ascii').strip()
-            #print(f"DEBUG: Received error response: {error_response}")
-
+            print(f"DEBUG: [Thread {threading.get_ident()}] Response: {response}")
             if response == 'e':
                 raise Exception(f"Error from device: {response}")
-
-            return response  # Return the version number
+            return response
 
     def close_connection(self):
         """
