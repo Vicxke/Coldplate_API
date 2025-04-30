@@ -465,4 +465,6 @@ def syringe_set_withdraw_rate():
     
 
 if __name__ == '__main__':
+    syringeApi.connect("/dev/ttyACM1")
+    api.select_port("/dev/ttyUSB0")
     app.run(host='0.0.0.0', port=port)

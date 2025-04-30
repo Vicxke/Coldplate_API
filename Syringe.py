@@ -17,6 +17,11 @@ class SyringeCommands:
             self.port = port 
             self.connection = serial.Serial(port, baudrate=self.baudrate, timeout=self.timeout)
             print(f"✅ Verbonden met {port}")
+            
+            # Verify the connection
+            if not self.verify_connection():
+                self.disconnect()
+                raise ConnectionError("Verbinding mislukt: apparaat niet herkend.")
         except Exception as e:
             raise ConnectionError(f"Fout bij verbinden met de poort {port}: {e}")
 
@@ -41,3 +46,21 @@ class SyringeCommands:
                     raise IOError(f"Fout bij versturen van commando: {e}")
             else:
                 raise ConnectionError("Geen actieve verbinding om commando te versturen.")
+
+    def verify_connection(self):
+        """
+        Verify the connection by sending the ECHO command.
+        """
+        if not self.connection or not self.connection.is_open:
+            raise ConnectionError("Geen actieve verbinding om te verifiëren.")
+        
+        try:
+            response = self.send_command("echo on")  # Send the ECHO command
+            print(f"DEBUG: ECHO response: {response}")  # Debug print to check the response
+            # Check if the response contains the expected confirmation
+            if "echo on" in response or "echo is ON" in response:
+                return True
+            else:
+                return False
+        except Exception as e:
+            raise IOError(f"Fout bij het verifiëren van de verbinding: {e}")
