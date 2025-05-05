@@ -16,12 +16,11 @@ class SyringeCommands:
         try:
             self.port = port 
             self.connection = serial.Serial(port, baudrate=self.baudrate, timeout=self.timeout)
-            print(f"✅ Verbonden met {port}")
-            
             # Verify the connection
             if not self.verify_connection():
                 self.disconnect()
                 raise ConnectionError("Verbinding mislukt: apparaat niet herkend.")
+            print(f"✅ Verbonden met {port}")
         except Exception as e:
             raise ConnectionError(f"Fout bij verbinden met de poort {port}: {e}")
 
